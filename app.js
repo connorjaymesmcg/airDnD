@@ -8,8 +8,8 @@
 const raceSelect = document.getElementById('races')
 const classSelect = document.getElementById('classes');
 const raceDescriptionContainer = document.querySelector('.race-description')
+// const raceTraitsContainer = document.querySelector('.race_trait-title')
 const classDescriptionContainer = document.querySelector('.class-description')
-
 
 const renderRaceDescription = function (data) {
   let html = `
@@ -46,7 +46,12 @@ const traitDescription = async function (url) {
     const traits = data.desc.map(entries => {
       return entries
     });
-    // console.log(traits)
+    console.log(traits)
+
+    traits.forEach(el => {
+
+      raceDescriptionContainer.insertAdjacentHTML('beforeend', el)
+    })
   }
   catch (err) {
     console.log('Error - could not retrieve trait data', `${err}`)
