@@ -1,11 +1,10 @@
 'use strict';
 
 // To do: 
-// - Fix error when no traits i.e. Human and Gnome 
 // - Print trait descriptions and filter empty values
 // - Visual error handling
 
-
+// Page elements
 const raceSelect = document.getElementById('races')
 const classSelect = document.getElementById('classes');
 const raceDescriptionContainer = document.querySelector('.race-description')
@@ -13,26 +12,52 @@ const classDescriptionContainer = document.querySelector('.class-description')
 
 
 const renderRaceDescription = function (data) {
-
-  const html = `
+  let html = `
   <h3 class="race_name">${data.name}</h3>
   <h4 class="race_size">${data.size}</h3>
   <p class="race_size-description">${data.size_description}</h3>
   <p class="race_size-description">${data.alignment}</h3>
   <p class="race_size-description">${data.language_desc}</h3>
   <h4 class="race_trait-title">Traits:</h3>
-  <p class="race_traits">${data.traits[0].name}</h3>
-  <p class="race_traits">${data.traits[1].name}</h3>
-  <p class="race_traits">${data.traits[2].name}</h3>
   `;
   raceDescriptionContainer.insertAdjacentHTML('beforeend', html)
+  // console.log(traits[0].name)
+  handleTraits(data)
+}
+
+const handleTraits = async function (data) {
+  const traits = Object.values(data.traits)
+  let urlArr = []
+  for (let i = 0; i < traits.length; i++) {
+    urlArr.push(traits[i].url)
+    raceDescriptionContainer.insertAdjacentHTML('beforeend',
+      `<p class="race_size-description">${traits[i].name}</h3>`)
+  }
+  console.log(urlArr)
+  for (let i = 0; i < urlArr.length; i++) {
+    traitDescription(urlArr[i])
+  }
+}
+
+const traitDescription = async function (url) {
+  try {
+    const res = await fetch(`https://www.dnd5eapi.co${url}`)
+    const data = await res.json();
+    const traits = data.desc.map(entries => {
+      return entries
+    });
+    // console.log(traits)
+  }
+  catch (err) {
+    console.log('Error - could not retrieve trait data', `${err}`)
+  }
 }
 
 const renderClass = function (data) {
+  const proficiencies = data.proficiencies
+  console.log(proficiencies)
   const html = `
-  <h3 class="class_name">${data.name}</h3>
-
-  `
+  <h3 class="class_name">${data.name}</h3>`
   classDescriptionContainer.insertAdjacentHTML('beforeend', html)
 }
 
@@ -92,7 +117,7 @@ const getRaceInfo = async function (race) {
         if (obj[key] === Object(obj[key])) newObj[key] = removeEmpty(obj[key])
         else if (obj[key] !== undefined) newObj[key] = obj[key]
       })
-      console.log(newObj)
+      // console.log(newObj)
       return newObj
     }
     const newData = removeEmpty(data)
@@ -112,6 +137,19 @@ const getClassInfo = async function (classString) {
     renderError(err.message)
   }
 }
+
+// Handle lack of data
+// const handleTraits = traits => {
+//   for (names in traits) {
+
+//   }
+// }
+
+// if (!traits || traits.length === 0) return "";
+// const html = traits.map(trait => (
+//   `<p class='race_traits'> ${trait.name}</p>`
+// ).join(""))
+// return html
 
 // getClassInfo('rogue')
 
