@@ -1,15 +1,15 @@
 'use strict';
 
-// To do: 
-// - Print trait descriptions and filter empty values
+// To do:
+// - Render trait titles and descriptions with one function
 // - Visual error handling
 
 // Page elements
-const raceSelect = document.getElementById('races')
+const raceSelect = document.getElementById('races');
 const classSelect = document.getElementById('classes');
-const raceDescriptionContainer = document.querySelector('.race-description')
+const raceDescriptionContainer = document.querySelector('.race-description');
 // const raceTraitsContainer = document.querySelector('.race_trait-title')
-const classDescriptionContainer = document.querySelector('.class-description')
+const classDescriptionContainer = document.querySelector('.class-description');
 
 const renderRaceDescription = function (data) {
   let html = `
@@ -20,55 +20,52 @@ const renderRaceDescription = function (data) {
   <p class="race_size-description">${data.language_desc}</h3>
   <h4 class="race_trait-title">Traits:</h3>
   `;
-  raceDescriptionContainer.insertAdjacentHTML('beforeend', html)
+  raceDescriptionContainer.insertAdjacentHTML('beforeend', html);
   // console.log(traits[0].name)
-  handleTraits(data)
-}
+  handleTraits(data);
+};
 
 const handleTraits = async function (data) {
-  const traits = Object.values(data.traits)
-  let urlArr = []
+  const traits = Object.values(data.traits);
+  let urlArr = [];
   for (let i = 0; i < traits.length; i++) {
-    urlArr.push(traits[i].url)
-    raceDescriptionContainer.insertAdjacentHTML('beforeend',
-      `<p class="race_size-description">${traits[i].name}</h3>`)
+    urlArr.push(traits[i].url);
+    // raceDescriptionContainer.insertAdjacentHTML('beforeend',
+    //   `<p class="race_size-description">${traits[i].name}</h3>`)
   }
-  console.log(urlArr)
+  console.log(urlArr);
   for (let i = 0; i < urlArr.length; i++) {
-    traitDescription(urlArr[i])
+    traitDescription(urlArr[i]);
   }
-}
+};
 
 const traitDescription = async function (url) {
   try {
-    const res = await fetch(`https://www.dnd5eapi.co${url}`)
+    const res = await fetch(`https://www.dnd5eapi.co${url}`);
     const data = await res.json();
-    const traits = data.desc.map(entries => {
-      return entries
+    const traitName = data.name;
+    const traitDesc = data.desc.map((entries) => {
+      return entries;
     });
-    console.log(traits)
-
-    traits.forEach(el => {
-
-      raceDescriptionContainer.insertAdjacentHTML('beforeend', el)
-    })
+    console.log(traitName);
+    let html = `<p class="race_trait-description"> ${traitName} - ${traitDesc} </p>`
+      raceDescriptionContainer.insertAdjacentHTML('beforeend', html);
+  } catch (err) {
+    console.log('Error - could not retrieve trait data', `${err}`);
   }
-  catch (err) {
-    console.log('Error - could not retrieve trait data', `${err}`)
-  }
-}
+};
 
 const renderClass = function (data) {
-  const proficiencies = data.proficiencies
-  console.log(proficiencies)
+  const proficiencies = data.proficiencies;
+  console.log(proficiencies);
   const html = `
-  <h3 class="class_name">${data.name}</h3>`
-  classDescriptionContainer.insertAdjacentHTML('beforeend', html)
-}
+  <h3 class="class_name">${data.name}</h3>`;
+  classDescriptionContainer.insertAdjacentHTML('beforeend', html);
+};
 
 const renderError = function (msg) {
-  raceDescriptionContainer.insertAdjacentHTML('beforeend', msg)
-}
+  raceDescriptionContainer.insertAdjacentHTML('beforeend', msg);
+};
 
 // Pull race data and populate select element
 const getRaces = async function () {
@@ -110,38 +107,37 @@ const getClasses = async function () {
   }
 };
 
-
 const getRaceInfo = async function (race) {
   try {
-    const res = await fetch(`https://www.dnd5eapi.co/api/races/${race}/`)
-    const data = await res.json()
-    console.log(data)
+    const res = await fetch(`https://www.dnd5eapi.co/api/races/${race}/`);
+    const data = await res.json();
+    console.log(data);
     const removeEmpty = (obj) => {
-      let newObj = {}
+      let newObj = {};
       Object.keys(obj).forEach((key) => {
-        if (obj[key] === Object(obj[key])) newObj[key] = removeEmpty(obj[key])
-        else if (obj[key] !== undefined) newObj[key] = obj[key]
-      })
+        if (obj[key] === Object(obj[key])) newObj[key] = removeEmpty(obj[key]);
+        else if (obj[key] !== undefined) newObj[key] = obj[key];
+      });
       // console.log(newObj)
-      return newObj
-    }
-    const newData = removeEmpty(data)
-    renderRaceDescription(newData)
+      return newObj;
+    };
+    const newData = removeEmpty(data);
+    renderRaceDescription(newData);
   } catch (err) {
-    renderError(err.message)
+    renderError(err.message);
   }
-}
+};
 
 const getClassInfo = async function (classString) {
   try {
-    const res = await fetch(`https://www.dnd5eapi.co/api/classes/${classString}/`)
-    const data = await res.json()
-    renderClass(data)
-    console.log(data)
+    const res = await fetch(`https://www.dnd5eapi.co/api/classes/${classString}/`);
+    const data = await res.json();
+    renderClass(data);
+    console.log(data);
   } catch (err) {
-    renderError(err.message)
+    renderError(err.message);
   }
-}
+};
 
 // Handle lack of data
 // const handleTraits = traits => {
@@ -159,17 +155,16 @@ const getClassInfo = async function (classString) {
 // getClassInfo('rogue')
 
 raceSelect.addEventListener('change', (e) => {
-  raceDescriptionContainer.innerHTML = ' '
-  const race = e.target.value.toLowerCase()
-  getRaceInfo(race)
-})
+  raceDescriptionContainer.innerHTML = ' ';
+  const race = e.target.value.toLowerCase();
+  getRaceInfo(race);
+});
 
 classSelect.addEventListener('change', (e) => {
-  classDescriptionContainer.innerHTML = ' '
-  const selectedClass = e.target.value.toLowerCase()
-  getClassInfo(selectedClass)
-})
-
+  classDescriptionContainer.innerHTML = ' ';
+  const selectedClass = e.target.value.toLowerCase();
+  getClassInfo(selectedClass);
+});
 
 getClasses();
-getRaces()
+getRaces();
