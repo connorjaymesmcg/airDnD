@@ -12,12 +12,14 @@ const classDescriptionContainer = document.querySelector('.class-description');
 // Render race data
 const renderRaceDescription = function (data) {
   let html = `
+  <div class="race_container">
   <h3 class="race_name">${data.name}</h3>
   <h4 class="race_size">${data.size}</h3>
   <p class="race_size-description">${data.size_description}</h3>
   <p class="race_size-description">${data.alignment}</h3>
   <p class="race_size-description">${data.language_desc}</h3>
   <h4 class="race_trait-title">Traits:</h3>
+  </div>
   `;
   raceDescriptionContainer.insertAdjacentHTML('beforeend', html);
   handleTraits(data);

@@ -4,3 +4,13 @@
   padding: 0;
 }
 
+.main {
+  margin: 0 auto;
+  width: 80%;
+}
+
+.selectors {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
