@@ -2,6 +2,7 @@
 
 // To do:
 // - Visual error handling
+// - 'undefined' errors when selecting "please choose a..." in the select elements
 
 // Page elements
 const raceSelect = document.getElementById('races');
@@ -11,13 +12,14 @@ const classDescriptionContainer = document.querySelector('.class-description');
 
 // Render race data
 const renderRaceDescription = function (data) {
+  console.log(data)
   let html = `
   <div class="race_container">
-  <h3 class="race_name">${data.name}</h3>
-  <h4 class="race_size">${data.size}</h3>
-  <p class="race_size-description">${data.size_description}</h3>
-  <p class="race_size-description">${data.alignment}</h3>
-  <p class="race_size-description">${data.language_desc}</h3>
+  <h3 class="race_name">${data.name ? data.name : `Please make a selection`}</h3>
+  <h4 class="race_size">${data.size ? data.size : ' '}</h3>
+  <p class="race_size-description">${data.size_description ? data.size_description : ' '}</h3>
+  <p class="race_size-description">${data.alignment ? data.alignment : ' '}</h3>
+  <p class="race_size-description">${data.language_desc ? data.language_desc : ' '}</h3>
   <h4 class="race_trait-title">Traits:</h3>
   </div>
   `;
@@ -27,6 +29,7 @@ const renderRaceDescription = function (data) {
 
 // Retrieve race trait data
 const handleTraits = async function (data) {
+  // if (data.traits === undefined) raceDescriptionContainer.insertAdjacentHTML('afterbegin', 'Please select a valid option')
   const traits = Object.values(data.traits);
   let urlArr = [];
   for (let i = 0; i < traits.length; i++) {
