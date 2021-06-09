@@ -2,7 +2,7 @@
 
 // To do:
 // - Visual error handling
-// - 'undefined' errors when selecting "please choose a..." in the select elements
+// Refactor handleTraits function to handle dynamic data (proficiencies, starting equipment, etc)
 
 // Page elements
 const raceSelect = document.getElementById('races');
@@ -12,7 +12,6 @@ const classDescriptionContainer = document.querySelector('.class-description');
 
 // Render race data
 const renderRaceDescription = function (data) {
-  console.log(data)
   let html = `
   <div class="race_container">
   <h3 class="race_name">${data.name ? data.name : `Please make a selection`}</h3>
@@ -29,17 +28,20 @@ const renderRaceDescription = function (data) {
 
 // Retrieve race trait data
 const handleTraits = async function (data) {
-  // if (data.traits === undefined) raceDescriptionContainer.insertAdjacentHTML('afterbegin', 'Please select a valid option')
-  const traits = Object.values(data.traits);
-  let urlArr = [];
-  for (let i = 0; i < traits.length; i++) {
-    urlArr.push(traits[i].url);
-  }
-  console.log(urlArr);
-
-  // Dynamically render trait titles and descriptions
-  for (let i = 0; i < urlArr.length; i++) {
-    traitDescription(urlArr[i]);
+  try {
+    // if (data.traits === undefined) raceDescriptionContainer.insertAdjacentHTML('afterbegin', 'Please select a valid option')
+    const traits = Object.values(data.traits);
+    let urlArr = [];
+    for (let i = 0; i < traits.length; i++) {
+      urlArr.push(traits[i].url);
+    }
+    console.log(urlArr);
+    // Dynamically render trait titles and descriptions
+    for (let i = 0; i < urlArr.length; i++) {
+      traitDescription(urlArr[i]);
+    }
+  } catch (err) {
+    console.log('Error - could not retrieve trait data', `${err}`)
   }
 };
 
@@ -59,14 +61,35 @@ const traitDescription = async function (url) {
   }
 };
 
-const renderClass = function (data) {
-  const proficiencies = data.proficiencies;
-  console.log(proficiencies);
+//
+// Render class data
+//
+const renderClassDescription = function (data) {
+  console.log(data)
   const html = `
-  <h3 class="class_name">${data.name}</h3>`;
+  <h3 class="class_name">${data.name}</h3>
+  `;
+
   classDescriptionContainer.insertAdjacentHTML('beforeend', html);
+  handleProficiencies(data)
 };
 
+// Retrieve class data
+const handleProficiencies = async function (data) {
+  try {
+    const proficiencies = Object.values(data.proficiencies).map(el => el.name)
+    console.log(proficiencies)
+    let html = `<p>${proficiencies}<p>`
+    classDescriptionContainer.insertAdjacentHTML('beforeend', html)
+
+  } catch (err) {
+    console.log('Error - could not retrieve proficiencies')
+  }
+}
+
+
+
+// Visual error handling
 const renderError = function (msg) {
   raceDescriptionContainer.insertAdjacentHTML('beforeend', msg);
 };
@@ -135,8 +158,7 @@ const getClassInfo = async function (classString) {
   try {
     const res = await fetch(`https://www.dnd5eapi.co/api/classes/${classString}/`);
     const data = await res.json();
-    renderClass(data);
-    console.log(data);
+    renderClassDescription(data);
   } catch (err) {
     renderError(err.message);
   }
