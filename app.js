@@ -3,13 +3,18 @@
 // To do:
 // - Visual error handling
 // Refactor handleTraits function to handle dynamic data (proficiencies, starting equipment, etc)
+// Assign class levels/features/bonuses to dynamic table
 
+//
 // Page elements
 const raceSelect = document.getElementById('races');
 const classSelect = document.getElementById('classes');
 const raceDescriptionContainer = document.querySelector('.race-description');
 const classDescriptionContainer = document.querySelector('.class-description');
+const classTable = document.querySelector('.class-table');
+const classLevel = document.querySelector('.level');
 
+//
 // Render race data
 const renderRaceDescription = function (data) {
   let html = `
@@ -26,6 +31,7 @@ const renderRaceDescription = function (data) {
   handleTraits(data);
 };
 
+//
 // Retrieve race trait data
 const handleTraits = async function (data) {
   try {
@@ -35,16 +41,17 @@ const handleTraits = async function (data) {
     for (let i = 0; i < traits.length; i++) {
       urlArr.push(traits[i].url);
     }
-    console.log(urlArr);
     // Dynamically render trait titles and descriptions
     for (let i = 0; i < urlArr.length; i++) {
       traitDescription(urlArr[i]);
     }
   } catch (err) {
-    console.log('Error - could not retrieve trait data', `${err}`)
+    console.log('Error - could not retrieve trait data', `${err}`);
   }
 };
 
+//
+// Retrieve trait description data
 const traitDescription = async function (url) {
   try {
     const res = await fetch(`https://www.dnd5eapi.co${url}`);
@@ -53,7 +60,6 @@ const traitDescription = async function (url) {
     const traitDesc = data.desc.map((entries) => {
       return entries;
     });
-    console.log(traitName);
     let html = `<p class="race_trait-description"> ${traitName} - ${traitDesc} </p>`;
     raceDescriptionContainer.insertAdjacentHTML('beforeend', html);
   } catch (err) {
@@ -62,38 +68,55 @@ const traitDescription = async function (url) {
 };
 
 //
-// Render class data
-//
+// Render class description data
 const renderClassDescription = function (data) {
-  console.log(data)
+  // console.log(data);
   const html = `
   <h3 class="class_name">${data.name}</h3>
   `;
-
+  console.log(data)
   classDescriptionContainer.insertAdjacentHTML('beforeend', html);
-  handleProficiencies(data)
+  handleProficiencies(data);
 };
 
-// Retrieve class data
+
+//
+// Retrieve class description data
 const handleProficiencies = async function (data) {
   try {
-    const proficiencies = Object.values(data.proficiencies).map(el => el.name)
-    console.log(proficiencies)
-    let html = `<p>${proficiencies}<p>`
-    classDescriptionContainer.insertAdjacentHTML('beforeend', html)
-
+    const proficiencies = Object.values(data.proficiencies).map((el) => el.name);
+    let html = `<p>${proficiencies}<p>`;
+    classDescriptionContainer.insertAdjacentHTML('beforeend', html);
   } catch (err) {
-    console.log('Error - could not retrieve proficiencies')
+    console.log('Error - could not retrieve proficiencies');
   }
-}
+};
 
+const getClassLevels = async function (data) {
+  try {
+    const res = await (await fetch(`https://www.dnd5eapi.co/api/classes/${data}/levels`))
+    const blank = await res.json();
+    const levels = await blank.results.map(entries => {
+      return entries
+    });
+    console.log(levels)
+  } catch (err) {
+    console.log('Could not retrieve class levels');
+  }
+};
 
+const renderClassTable = async function (data) {
+  getClassLevels(data)
+  console.log(data)
+};
 
+//
 // Visual error handling
 const renderError = function (msg) {
   raceDescriptionContainer.insertAdjacentHTML('beforeend', msg);
 };
 
+//
 // Pull race data and populate select element
 const getRaces = async function () {
   try {
@@ -114,6 +137,7 @@ const getRaces = async function () {
   }
 };
 
+//
 // Pull class data and populate select element
 const getClasses = async function () {
   try {
@@ -159,11 +183,13 @@ const getClassInfo = async function (classString) {
     const res = await fetch(`https://www.dnd5eapi.co/api/classes/${classString}/`);
     const data = await res.json();
     renderClassDescription(data);
+    renderClassTable(data)
   } catch (err) {
     renderError(err.message);
   }
 };
 
+//
 // Event handlers for DOM interaction
 raceSelect.addEventListener('change', (e) => {
   raceDescriptionContainer.innerHTML = ' ';
