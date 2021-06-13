@@ -77,6 +77,11 @@ const renderClassDescription = function (data) {
   console.log(data)
   classDescriptionContainer.insertAdjacentHTML('beforeend', html);
   handleProficiencies(data);
+  getClassLevels(data.name)
+};
+
+const renderClassTable = async function (data) {
+
 };
 
 
@@ -93,10 +98,12 @@ const handleProficiencies = async function (data) {
 };
 
 const getClassLevels = async function (data) {
+  data = data.toLowerCase()
   try {
-    const res = await (await fetch(`https://www.dnd5eapi.co/api/classes/${data}/levels`))
-    const blank = await res.json();
-    const levels = await blank.results.map(entries => {
+    const res = await fetch(`https://www.dnd5eapi.co/api/classes/${data}/levels/`)
+    const levelData = await res.json();
+    console.log(levelData)
+    const levels = await levelData.map(entries => {
       return entries
     });
     console.log(levels)
@@ -105,10 +112,6 @@ const getClassLevels = async function (data) {
   }
 };
 
-const renderClassTable = async function (data) {
-  getClassLevels(data)
-  console.log(data)
-};
 
 //
 // Visual error handling
