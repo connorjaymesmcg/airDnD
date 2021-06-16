@@ -77,12 +77,15 @@ const renderClassDescription = function (data) {
   console.log(data)
   classDescriptionContainer.insertAdjacentHTML('beforeend', html);
   handleProficiencies(data);
-  getClassLevels(data.name)
+  // renderClassTable(data)
+  renderClassTable(data.name)
 };
 
-const renderClassTable = async function (data) {
+// const renderClassTable = async function (data) {
+//   data = data.name
+//   renderClassTable(data)
 
-};
+// };
 
 
 //
@@ -97,16 +100,22 @@ const handleProficiencies = async function (data) {
   }
 };
 
-const getClassLevels = async function (data) {
+const renderClassTable = async function (data) {
+  console.log(data)
   data = data.toLowerCase()
   try {
-    const res = await fetch(`https://www.dnd5eapi.co/api/classes/${data}/levels/`)
-    const levelData = await res.json();
+    const res = await (await fetch(`https://www.dnd5eapi.co/api/classes/${data}/levels/`)).json()
+    let levelData = Object.entries(res)
+    levelData = levelData.map(e => e[1])
     console.log(levelData)
-    const levels = await levelData.map(entries => {
-      return entries
-    });
-    console.log(levels)
+    // levelData.forEach(e => console.log(e[1].features))
+    // const levels = await levelData.map(entries => {
+    //   return entries
+    // });
+    const html = `
+    <h3 class='levelHeadline'>${levelData}</h3>
+    `
+    // classTable.insertAdjacentHTML('beforeend', html)
   } catch (err) {
     console.log('Could not retrieve class levels');
   }
@@ -186,7 +195,7 @@ const getClassInfo = async function (classString) {
     const res = await fetch(`https://www.dnd5eapi.co/api/classes/${classString}/`);
     const data = await res.json();
     renderClassDescription(data);
-    renderClassTable(data)
+    // renderClassTable(data)
   } catch (err) {
     renderError(err.message);
   }
